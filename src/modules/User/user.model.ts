@@ -5,19 +5,24 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema<IUser>(
   {
-    name: {
+    userName: {
       type: String,
       required: true,
-      unique: true,
     },
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
-      required: true,
       select: 0,
+      default: null,
+    },
+    provider: {
+      type: String,
+      enum: ["google", "github", "facebook", "credentials"],
+      required: true,
     },
     passwordUpdatedAt: {
       type: Date,
@@ -25,13 +30,13 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "superAdmin"],
       default: "user",
     },
     status: {
       type: String,
-      enum: ["blocked", "unblocked"],
-      default: "unblocked",
+      enum: ["blocked", "active"],
+      default: "active",
     },
   },
   {
@@ -42,7 +47,7 @@ const userSchema = new Schema<IUser>(
 userSchema.pre("save", async function (next) {
   const user = this;
   user.password = await bcrypt.hash(
-    user.password,
+    user.password as string,
     Number(config.bcrypt_salt_rounds)
   );
   next();

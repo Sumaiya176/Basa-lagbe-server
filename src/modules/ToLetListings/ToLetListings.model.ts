@@ -48,6 +48,10 @@ const toLetListingSchema = new Schema<TToLetListings>(
       enum: ["phoneCall", "email", "whatsapp"],
       required: true,
     },
+    propertyImages: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -34,4 +34,5 @@ export type TToLetListings = {
   ownerEmail: string;
   phone: string;
   preferredContact: "phoneCall" | "email" | "whatsapp";
+  propertyImages: string[];
 };

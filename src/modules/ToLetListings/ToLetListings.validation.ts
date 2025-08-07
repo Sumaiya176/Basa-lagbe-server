@@ -124,6 +124,7 @@ const createToLetListingValidationSchema = z.object({
       invalid_type_error:
         "Preferred contact must be either phoneCall, email, or whatsapp",
     }),
+    propertyImages: z.array(z.string()),
   }),
 });
 

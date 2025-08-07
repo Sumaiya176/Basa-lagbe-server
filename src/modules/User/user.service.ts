@@ -4,7 +4,15 @@ import { User } from "./user.model";
 import httpStatus from "http-status";
 
 const createUser = async (payload: IUser) => {
+  const isUserExist = await User.findOne({ email: payload?.email });
+  if (isUserExist) {
+    throw new AppError(httpStatus.CONFLICT, "User is already exists");
+  }
   const result = await User.create(payload);
+
+  if (!result) {
+    throw new Error("Failed to register new user");
+  }
 
   return result;
 };

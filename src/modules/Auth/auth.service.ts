@@ -9,7 +9,8 @@ import sendEmail from "../../util/sendEmail";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~ Login Service ~~~~~~~~~~~~~~~~~~~~~~~~~~
 const login = async (payload: TUser) => {
-  const isUserExists = await User.findOne({ name: payload?.name }).select(
+  console.log(payload);
+  const isUserExists = await User.findOne({ email: payload?.email }).select(
     "+password"
   );
   // ---- checking if the user is exist ------
@@ -25,14 +26,14 @@ const login = async (payload: TUser) => {
 
   const isPasswordMatched = await bcrypt.compare(
     payload?.password,
-    isUserExists?.password
+    isUserExists?.password as string
   );
   if (!isPasswordMatched)
     throw new AppError(httpStatus.FORBIDDEN, "Wrong Password");
 
   const jwtPayload = {
     id: isUserExists?._id,
-    name: isUserExists?.name,
+    email: isUserExists?.email,
     role: isUserExists?.role,
   };
 
@@ -76,7 +77,7 @@ const refreshToken = async (token: string) => {
 
   const jwtPayload = {
     id: user?._id,
-    name: user?.name,
+    email: user?.email,
     role: user?.role,
   };
 
@@ -102,7 +103,7 @@ const changePassword = async (
   // ----- checking if the old password is matched or not -----
   const isPasswordMatched = bcrypt.compare(
     payload?.oldPassword,
-    user?.password
+    user?.password as string
   );
   if (!isPasswordMatched)
     throw new AppError(httpStatus.FORBIDDEN, "Wrong Old Password");
@@ -139,7 +140,7 @@ const forgetPassword = async (id: string) => {
 
   const jwtPayload = {
     id: user?._id,
-    name: user?.name,
+    email: user?.email,
     role: user?.role,
   };
 

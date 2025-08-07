@@ -2,11 +2,13 @@ import app from "./app";
 import config from "./config/index";
 import mongoose from "mongoose";
 import { Server } from "http";
+import seedSuperAdmin from "./DB/index";
 
 let server: Server;
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
+    seedSuperAdmin();
     console.log("✅✅ Database is connected successfully 👍👍");
 
     server = app.listen(config.port, () => {
@@ -21,17 +23,17 @@ async function main() {
 
 main();
 
-// process.on("unhandledRejection", () => {
-//   console.log("Unhandled Rejection is detected. Server is shutting down...");
-//   if (server) {
-//     server.close(() => {
-//       process.exit(1);
-//     });
-//   }
-//   process.exit(1);
-// });
+process.on("unhandledRejection", () => {
+  console.log("Unhandled Rejection is detected. Server is shutting down...");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
 
-// process.on("uncaughtException", () => {
-//   console.log("Uncaught Exception is detected. Server is shutting down...");
-//   process.exit(1);
-// });
+process.on("uncaughtException", () => {
+  console.log("Uncaught Exception is detected. Server is shutting down...");
+  process.exit(1);
+});

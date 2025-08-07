@@ -2,8 +2,23 @@ import AppError from "../../Error/AppError";
 import httpStatus from "http-status";
 import { TToLetListings } from "./ToLetListings.interface";
 import { ToLetListing } from "./ToLetListings.model";
+import { ImageSendToCloudinary } from "../../util/ImageSendToCloudinary";
 
-const createToLetListings = async (payload: TToLetListings) => {
+const createToLetListings = async (files: any, payload: TToLetListings) => {
+  console.log("from to let listings", files, payload);
+  if (files && files.length) {
+    const imageUrls: string[] = [];
+
+    for (const file of files) {
+      const imageName = `${payload.ownerName}${Date.now()}`;
+      const path = file.path;
+
+      const { secure_url } = await ImageSendToCloudinary(imageName, path);
+      imageUrls.push(secure_url as string);
+    }
+    payload.propertyImages = imageUrls;
+  }
+
   if (new Date(payload?.availability) < new Date()) {
     throw new AppError(
       httpStatus.BAD_REQUEST,

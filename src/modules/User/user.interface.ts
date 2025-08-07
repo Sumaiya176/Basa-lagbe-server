@@ -1,8 +1,9 @@
 export interface IUser {
-  name: string;
+  userName: string;
   email: string;
-  password: string;
+  password?: string | null;
+  provider: "google" | "github" | "facebook" | "credentials";
   passwordUpdatedAt?: Date | null;
-  role: "user" | "admin";
-  status: "blocked" | "unblocked";
+  role: "user" | "admin" | "superAdmin";
+  status: "blocked" | "active";
 }

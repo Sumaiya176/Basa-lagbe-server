@@ -26,14 +26,14 @@ const router = Router();
  *     User:
  *       type: object
  *       required:
- *         - name
+ *         - userName
  *         - email
  *         - password
  *       properties:
  *         id:
  *           type: string
  *           description: The auto-generated id of user
- *         name:
+ *         userName:
  *           type: string
  *           description: User name
  *         email:

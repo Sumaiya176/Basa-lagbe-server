@@ -68,10 +68,10 @@ const globalErrorHandler = (
   }
 
   res.status(statusCode).json({
-    success: false,
+    isSuccess: false,
     message,
     errSource,
-    amarerror: err,
+    // amarerror: err,
     stack: config.node_env === "development" ? err?.stack : null,
   });
 };

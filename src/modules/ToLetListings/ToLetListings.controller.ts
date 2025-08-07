@@ -9,7 +9,11 @@ const createToLetListings = async (
   next: NextFunction
 ) => {
   try {
-    const result = await ToLetListingsService.createToLetListings(req.body);
+    console.log(req.files, req.body);
+    const result = await ToLetListingsService.createToLetListings(
+      req.files,
+      req.body
+    );
 
     sendResponse(res, {
       isSuccess: true,

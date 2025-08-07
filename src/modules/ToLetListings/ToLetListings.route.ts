@@ -1,8 +1,9 @@
-import { Router } from "express";
+import { NextFunction, Router, Request, Response } from "express";
 
 import schemaValidation from "../../middlewares/schemaValidation";
 import { toLetListingValidation } from "./ToLetListings.validation";
 import { ToLetListingsController } from "./ToLetListings.controller";
+import { upload } from "../../util/ImageSendToCloudinary";
 
 const route = Router();
 
@@ -259,7 +260,15 @@ const route = Router();
 
 route.post(
   "/",
-  schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
+  upload.array("propertyImages", 10),
+  // (req: Request, res: Response, next: NextFunction) => {
+  //   console.log("hhjhj", req);
+
+  //   req.body = JSON.parse(req.body);
+  //   console.log(req.body);
+  //   next();
+  // },
+  //schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
   ToLetListingsController.createToLetListings
 );
 route.get("/", ToLetListingsController.getAllToLetListings);

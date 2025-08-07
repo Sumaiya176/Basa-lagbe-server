@@ -4,6 +4,7 @@ import { sendResponse } from "../../util/sendResponse";
 
 const createUser: RequestHandler = async (req, res, next) => {
   try {
+    console.log(req.body);
     const result = await userService.createUser(req.body);
 
     sendResponse(res, {

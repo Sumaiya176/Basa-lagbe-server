@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { TUserRole } from "../interface/role";
 import { User } from "../modules/User/user.model";
+import { verifyToken } from "../util/generateJwtToken";
 
 const auth = (...roles: TUserRole[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -16,10 +17,18 @@ const auth = (...roles: TUserRole[]) => {
         throw new AppError(httpStatus.UNAUTHORIZED, "Your are not authorized");
       }
 
-      const decoded = jwt.verify(
+      let decoded: JwtPayload = verifyToken(
         token,
         config.jwt_access_secret as string
-      ) as JwtPayload;
+      );
+      // try {
+      //   decoded = jwt.verify(
+      //     token,
+      //     config.jwt_access_secret as string
+      //   ) as JwtPayload;
+      // } catch (err) {
+      //   throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
+      // }
 
       const { id, role, iat } = decoded;
 

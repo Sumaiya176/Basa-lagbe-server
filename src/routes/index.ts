@@ -15,7 +15,7 @@ const allRoutes = [
     route: authRouter,
   },
   {
-    path: "/to-letListings",
+    path: "/listing",
     route: ToLetListingsRouter,
   },
 ];

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authController } from "./auth.controller";
 import schemaValidation from "../../middlewares/schemaValidation";
 import { authValidation } from "./auth.validation";
+import passport from "passport";
 
 const router = Router();
 
@@ -61,6 +62,8 @@ router.post(
   schemaValidation(authValidation.loginValidationSchema),
   authController.login
 );
+router.post("/logout", authController.logOut);
+
 router.post(
   "/refresh-token",
   schemaValidation(authValidation.refreshTokenValidationSchema),
@@ -80,6 +83,39 @@ router.post(
   "/reset-password",
   schemaValidation(authValidation.resetPasswordValidationSchema),
   authController.changePassword
+);
+
+// GitHub OAuth
+// router.get("/github", passport.authenticate("github", { scope: ["user:email"] }));
+// router.get(
+//   "/github/callback",
+//   passport.authenticate("github", { session: false }),
+//   (req, res) => res.redirect(`/dashboard?token=${req?.user?.token as string}`)
+// );
+
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["profile", "email"] })
+);
+router.get(
+  "/github/callback",
+  passport.authenticate("github", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  authController.OAuthLoginSuccess
+);
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  authController.OAuthLoginSuccess
 );
 
 export const authRouter = router;

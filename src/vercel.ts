@@ -1,11 +1,14 @@
+import type { IncomingMessage, ServerResponse } from "http";
 import app from "./app";
 import serverless from "serverless-http";
 import { connectDB } from "./db";
 
-let handler: any;
+let handler: ReturnType<typeof serverless> | null = null;
 
-// Connect DB only once globally
-export default async function (req: any, res: any) {
+export default async function handlerWrapper(
+  req: IncomingMessage,
+  res: ServerResponse
+) {
   await connectDB();
 
   if (!handler) {

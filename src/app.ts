@@ -14,13 +14,13 @@ import mongoose from "mongoose";
 
 const app: Application = express();
 
-app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://basa-lagbe.vercel.app"],
     credentials: true,
   })
 );
+app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 

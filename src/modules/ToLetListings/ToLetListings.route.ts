@@ -1,5 +1,6 @@
 import { NextFunction, Router, Request, Response } from "express";
 
+import cors from "cors";
 import schemaValidation from "../../middlewares/schemaValidation";
 import { toLetListingValidation } from "./ToLetListings.validation";
 import { ToLetListingsController } from "./ToLetListings.controller";
@@ -275,7 +276,14 @@ route.post(
 );
 // --------------------- get my listings ----------------------
 route.get("/myListings", auth(), ToLetListingsController.myLetListings);
-route.get("/", ToLetListingsController.getAllToLetListings);
+route.get(
+  "/",
+  cors({
+    origin: ["https://basa-lagbe.vercel.app", "http://localhost:3000"],
+    credentials: true,
+  }),
+  ToLetListingsController.getAllToLetListings
+);
 route.get("/:id", ToLetListingsController.getSingleToLetListings);
 route.patch("/:id", auth(), ToLetListingsController.updateToLetListings);
 route.delete("/:id", auth(), ToLetListingsController.deleteToLetListings);

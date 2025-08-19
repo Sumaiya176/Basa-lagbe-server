@@ -38,6 +38,12 @@ const userSchema = new Schema<IUser>(
       enum: ["blocked", "active"],
       default: "active",
     },
+    listingHistory: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ToLetListing",
+      },
+    ],
   },
   {
     timestamps: true,

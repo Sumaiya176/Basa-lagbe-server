@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface IUser {
   userName: string;
   email: string;
@@ -6,4 +8,13 @@ export interface IUser {
   passwordUpdatedAt?: Date | null;
   role: "user" | "admin" | "superAdmin";
   status: "blocked" | "active";
+  listingHistory: [Types.ObjectId];
 }
+
+export type TDecodedUser = {
+  id: string;
+  email: string;
+  role: string;
+  iat: number;
+  exp: number;
+};

@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export type TToLetListings = {
   propertyType: "family" | "sublet" | "office";
   bedroom: number;
@@ -35,4 +37,5 @@ export type TToLetListings = {
   phone: string;
   preferredContact: "phoneCall" | "email" | "whatsapp";
   propertyImages: string[];
+  owner: Types.ObjectId;
 };

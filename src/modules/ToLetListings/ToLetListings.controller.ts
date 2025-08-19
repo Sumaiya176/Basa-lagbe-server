@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { sendResponse } from "../../util/sendResponse";
 import { ToLetListingsService } from "./ToLetListings.service";
+import { TDecodedUser } from "../User/user.interface";
 
 const createToLetListings = async (
   req: Request,
@@ -9,11 +10,17 @@ const createToLetListings = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.files, req.body);
     const result = await ToLetListingsService.createToLetListings(
       req.files,
-      req.body
+      req.body,
+      req.user as TDecodedUser
     );
+
+    if (!result) {
+      throw new Error("Listings not created");
+    }
+
+    console.log("from listings controller", result);
 
     sendResponse(res, {
       isSuccess: true,
@@ -78,7 +85,7 @@ const updateToLetListings = async (
 
     sendResponse(res, {
       isSuccess: true,
-      message: "updated To-let Listings successfully",
+      message: "Updated To-let Listings successfully",
       data: result,
     });
   } catch (err) {
@@ -93,13 +100,36 @@ const deleteToLetListings = async (
   next: NextFunction
 ) => {
   try {
+    const { id } = req.user as TDecodedUser;
     const result = await ToLetListingsService.deleteToLetListings(
-      req.params.id
+      req.params.id,
+      id
     );
 
     sendResponse(res, {
       isSuccess: true,
-      message: "deleted To-let Listings successfully",
+      message: "Deleted To-let Listings successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const myLetListings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await ToLetListingsService.myLetListings(
+      req.user as TDecodedUser
+    );
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Get my Listings successfully",
       data: result,
     });
   } catch (err) {
@@ -114,4 +144,5 @@ export const ToLetListingsController = {
   getSingleToLetListings,
   updateToLetListings,
   deleteToLetListings,
+  myLetListings,
 };

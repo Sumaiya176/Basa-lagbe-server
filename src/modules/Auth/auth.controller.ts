@@ -80,8 +80,14 @@ const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    const { refreshToken } = req.cookies;
-    const result = await authService.refreshToken(refreshToken);
+    const token = req.cookies.refreshToken;
+    const result = await authService.refreshToken(token);
+
+    const { refreshToken } = result;
+    res.cookie("refreshToken", refreshToken, {
+      secure: config.node_env === "production",
+      httpOnly: true,
+    });
 
     sendResponse(res, {
       isSuccess: true,

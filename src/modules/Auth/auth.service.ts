@@ -85,7 +85,15 @@ const refreshToken = async (token: string) => {
     expiresIn: "10d",
   });
 
-  return { accessToken };
+  const refreshToken = jwt.sign(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    {
+      expiresIn: "30d",
+    }
+  );
+
+  return { accessToken, refreshToken };
 };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~ Change Password ~~~~~~~~~~~~~~~~~~~~~~~

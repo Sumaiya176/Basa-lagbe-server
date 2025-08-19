@@ -1,12 +1,12 @@
-import { Schema, model, Document } from "mongoose";
-import { TToLetListings } from "./ToLetListings.interface";
-
-const toLetListingSchema = new Schema<TToLetListings>(
-  {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToLetListing = void 0;
+const mongoose_1 = require("mongoose");
+const toLetListingSchema = new mongoose_1.Schema({
     propertyType: {
-      type: String,
-      enum: ["family", "sublet", "office"],
-      required: true,
+        type: String,
+        enum: ["family", "sublet", "office"],
+        required: true,
     },
     bedroom: { type: Number, required: true },
     bathroom: { type: Number, required: true },
@@ -21,7 +21,6 @@ const toLetListingSchema = new Schema<TToLetListings>(
     rent: { type: Number, required: true },
     advance: { type: Number, required: true },
     noticePeriod: { type: Number, required: true },
-
     electricity: { type: Boolean, default: null },
     gas: { type: Boolean, default: null },
     water: { type: Boolean, default: null },
@@ -39,25 +38,17 @@ const toLetListingSchema = new Schema<TToLetListings>(
     generator: { type: Boolean, default: null },
     fitnessCenter: { type: Boolean, default: null },
     ac: { type: Boolean, default: null },
-
     ownerName: { type: String, required: true },
     ownerEmail: { type: String, required: true, match: /.+\@.+\..+/ },
     phone: { type: String, required: true },
     preferredContact: {
-      type: String,
-      enum: ["phoneCall", "email", "whatsapp"],
-      required: true,
+        type: String,
+        enum: ["phoneCall", "email", "whatsapp"],
+        required: true,
     },
     propertyImages: {
-      type: [String],
-      default: [],
+        type: [String],
+        default: [],
     },
-    owner: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  { timestamps: true }
-);
-
-export const ToLetListing = model<TToLetListings>(
-  "ToLetListing",
-  toLetListingSchema
-);
+}, { timestamps: true });
+exports.ToLetListing = (0, mongoose_1.model)("ToLetListing", toLetListingSchema);

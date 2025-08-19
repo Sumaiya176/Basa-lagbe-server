@@ -3,9 +3,15 @@ import httpStatus from "http-status";
 import { TToLetListings } from "./ToLetListings.interface";
 import { ToLetListing } from "./ToLetListings.model";
 import { ImageSendToCloudinary } from "../../util/ImageSendToCloudinary";
+import mongoose from "mongoose";
+import { User } from "../User/user.model";
+import { TDecodedUser } from "../User/user.interface";
 
-const createToLetListings = async (files: any, payload: TToLetListings) => {
-  console.log("from to let listings", files, payload);
+const createToLetListings = async (
+  files: any,
+  payload: TToLetListings,
+  user: TDecodedUser
+) => {
   if (files && files.length) {
     const imageUrls: string[] = [];
 
@@ -25,7 +31,37 @@ const createToLetListings = async (files: any, payload: TToLetListings) => {
       "Availability cannot be less than current date"
     );
   }
-  return await ToLetListing.create(payload);
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const newListing = await ToLetListing.create([payload], { session });
+
+    if (!newListing) {
+      throw new Error("Failed to add listings");
+    }
+
+    const updateUserListingHistory = await User.findByIdAndUpdate(
+      user.id,
+      { $push: { listingHistory: newListing[0]._id } },
+      { new: true, session }
+    ).session(session);
+
+    if (!updateUserListingHistory) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return newListing[0];
+  } catch (err) {
+    console.log("error", err);
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error();
+  }
 };
 
 const getAllToLetListings = async () => {
@@ -46,8 +82,8 @@ const updateToLetListings = async (
   payload: Partial<TToLetListings>
 ) => {
   console.log(id, payload);
-  const isUserExist = await ToLetListing.findById(id);
-  if (!isUserExist) {
+  const isListingExist = await ToLetListing.findById(id);
+  if (!isListingExist) {
     throw new AppError(httpStatus.NOT_FOUND, "Listing is not found");
   }
 
@@ -59,13 +95,51 @@ const updateToLetListings = async (
   return result;
 };
 
-const deleteToLetListings = async (id: string) => {
-  const isUserExist = await ToLetListing.findById(id);
-  if (!isUserExist) {
+const deleteToLetListings = async (id: string, userId: string) => {
+  const isListingExist = await ToLetListing.findById(id);
+  if (!isListingExist) {
     throw new AppError(httpStatus.NOT_FOUND, "Listing is not found");
   }
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const deleteFromListing = await ToLetListing.findByIdAndDelete(id, {
+      session,
+    });
 
-  const result = await ToLetListing.findByIdAndDelete(id);
+    if (!deleteFromListing) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Listing not found or already deleted"
+      );
+    }
+    const deleteFromUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { listingHistory: id } },
+      { new: true, session }
+    ).session(session);
+
+    if (!deleteFromUser) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { deleteFromListing, deleteFromUser };
+  } catch (err) {
+    console.log("error", err);
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error();
+  }
+};
+
+const myLetListings = async (user: TDecodedUser) => {
+  const result = await User.findById(user.id).populate("listingHistory");
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Listing is not found");
+  }
 
   return result;
 };
@@ -76,4 +150,5 @@ export const ToLetListingsService = {
   getSingleToLetListings,
   updateToLetListings,
   deleteToLetListings,
+  myLetListings,
 };

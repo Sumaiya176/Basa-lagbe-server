@@ -1,7 +1,7 @@
 // backend/src/utils/jwt.ts
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
-import config from "../config";
+
 import AppError from "../Error/AppError";
 import httpStatus from "http-status";
 
@@ -10,7 +10,7 @@ export const generateToken = (
   payload: {
     id: Types.ObjectId;
     email: string;
-    role: "user" | "admin";
+    role: "user" | "admin" | "superAdmin";
   },
   expiration: number
 ) => {
@@ -20,11 +20,9 @@ export const generateToken = (
 export const verifyToken = (secret: string, token: string) => {
   let decoded: JwtPayload;
   try {
-    decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string
-    ) as JwtPayload;
+    decoded = jwt.verify(token, secret) as JwtPayload;
   } catch (err) {
+    // console.log("err from verify", err);
     throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
   }
   return decoded;

@@ -11,15 +11,15 @@ const auth = (...roles: TUserRole[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization;
-      console.log(req.headers.authorization);
 
       if (!token) {
         throw new AppError(httpStatus.UNAUTHORIZED, "Your are not authorized");
       }
 
+      console.log("from auth auth", req.headers.authorization);
       let decoded: JwtPayload = verifyToken(
-        token,
-        config.jwt_access_secret as string
+        config.jwt_access_secret as string,
+        token
       );
       // try {
       //   decoded = jwt.verify(
@@ -31,8 +31,7 @@ const auth = (...roles: TUserRole[]) => {
       // }
 
       const { id, role, iat } = decoded;
-
-      console.log(decoded);
+      console.log("id", id);
 
       const user = await User.findById(id);
 
@@ -40,7 +39,8 @@ const auth = (...roles: TUserRole[]) => {
       if (user?.status === "blocked")
         throw new AppError(httpStatus.FORBIDDEN, "User is blocked.");
 
-      if (roles && !roles.includes(role)) {
+      if (roles.length > 0 && roles.includes(role)) {
+        // console.log("from auth roles", roles, !roles.includes(role), user);
         throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
       }
 

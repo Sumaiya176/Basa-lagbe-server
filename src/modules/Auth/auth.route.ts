@@ -67,7 +67,7 @@ router.post("/logout", authController.logOut);
 router.post(
   "/refresh-token",
   schemaValidation(authValidation.refreshTokenValidationSchema),
-  authController.login
+  authController.refreshToken
 );
 router.post(
   "/change-password",

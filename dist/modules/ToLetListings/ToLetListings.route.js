@@ -1,20 +1,16 @@
-import { NextFunction, Router, Request, Response } from "express";
-
-import schemaValidation from "../../middlewares/schemaValidation";
-import { toLetListingValidation } from "./ToLetListings.validation";
-import { ToLetListingsController } from "./ToLetListings.controller";
-import { upload } from "../../util/ImageSendToCloudinary";
-import auth from "../../middlewares/auth";
-
-const route = Router();
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToLetListingsRouter = void 0;
+const express_1 = require("express");
+const ToLetListings_controller_1 = require("./ToLetListings.controller");
+const ImageSendToCloudinary_1 = require("../../util/ImageSendToCloudinary");
+const route = (0, express_1.Router)();
 /**
  * @swagger
  * tags:
  *   name: ToLetListings
  *   description: API for managing to-let property listings
  */
-
 /**
  * @swagger
  * components:
@@ -144,7 +140,6 @@ const route = Router();
  *           type: string
  *           example: email
  */
-
 /**
  * @swagger
  * /api/to-letListings:
@@ -167,7 +162,6 @@ const route = Router();
  *       400:
  *         description: Bad request
  */
-
 /**
  * @swagger
  * /api/to-letListings:
@@ -184,7 +178,6 @@ const route = Router();
  *               items:
  *                 $ref: '#/components/schemas/ToLetListing'
  */
-
 /**
  * @swagger
  * /api/to-letListings/{id}:
@@ -208,7 +201,6 @@ const route = Router();
  *       404:
  *         description: Listing not found
  */
-
 /**
  * @swagger
  * /api/to-letListings/{id}:
@@ -238,7 +230,6 @@ const route = Router();
  *       404:
  *         description: Listing not found
  */
-
 /**
  * @swagger
  * /api/to-letListings/{id}:
@@ -258,26 +249,17 @@ const route = Router();
  *       404:
  *         description: Listing not found
  */
-
-route.post(
-  "/",
-  auth(),
-  upload.array("propertyImages", 10),
-  // (req: Request, res: Response, next: NextFunction) => {
-  //   console.log("hhjhj", req);
-
-  //   req.body = JSON.parse(req.body);
-  //   console.log(req.body);
-  //   next();
-  // },
-  //schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
-  ToLetListingsController.createToLetListings
-);
-// --------------------- get my listings ----------------------
-route.get("/myListings", auth(), ToLetListingsController.myLetListings);
-route.get("/", ToLetListingsController.getAllToLetListings);
-route.get("/:id", ToLetListingsController.getSingleToLetListings);
-route.patch("/:id", auth(), ToLetListingsController.updateToLetListings);
-route.delete("/:id", auth(), ToLetListingsController.deleteToLetListings);
-
-export const ToLetListingsRouter = route;
+route.post("/", ImageSendToCloudinary_1.upload.array("propertyImages", 10), 
+// (req: Request, res: Response, next: NextFunction) => {
+//   console.log("hhjhj", req);
+//   req.body = JSON.parse(req.body);
+//   console.log(req.body);
+//   next();
+// },
+//schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
+ToLetListings_controller_1.ToLetListingsController.createToLetListings);
+route.get("/", ToLetListings_controller_1.ToLetListingsController.getAllToLetListings);
+route.get("/:id", ToLetListings_controller_1.ToLetListingsController.getSingleToLetListings);
+route.patch("/:id", ToLetListings_controller_1.ToLetListingsController.updateToLetListings);
+route.delete("/:id", ToLetListings_controller_1.ToLetListingsController.deleteToLetListings);
+exports.ToLetListingsRouter = route;

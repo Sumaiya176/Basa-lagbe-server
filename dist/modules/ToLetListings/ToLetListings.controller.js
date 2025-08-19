@@ -14,8 +14,11 @@ const sendResponse_1 = require("../../util/sendResponse");
 const ToLetListings_service_1 = require("./ToLetListings.service");
 const createToLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.files, req.body);
-        const result = yield ToLetListings_service_1.ToLetListingsService.createToLetListings(req.files, req.body);
+        const result = yield ToLetListings_service_1.ToLetListingsService.createToLetListings(req.files, req.body, req.user);
+        if (!result) {
+            throw new Error("Listings not created");
+        }
+        console.log("from listings controller", result);
         (0, sendResponse_1.sendResponse)(res, {
             isSuccess: true,
             message: "To-let Listings just created successfully",
@@ -60,7 +63,7 @@ const updateToLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0
         const result = yield ToLetListings_service_1.ToLetListingsService.updateToLetListings(req.params.id, req.body);
         (0, sendResponse_1.sendResponse)(res, {
             isSuccess: true,
-            message: "updated To-let Listings successfully",
+            message: "Updated To-let Listings successfully",
             data: result,
         });
     }
@@ -71,10 +74,25 @@ const updateToLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0
 });
 const deleteToLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield ToLetListings_service_1.ToLetListingsService.deleteToLetListings(req.params.id);
+        const { id } = req.user;
+        const result = yield ToLetListings_service_1.ToLetListingsService.deleteToLetListings(req.params.id, id);
         (0, sendResponse_1.sendResponse)(res, {
             isSuccess: true,
-            message: "deleted To-let Listings successfully",
+            message: "Deleted To-let Listings successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const myLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield ToLetListings_service_1.ToLetListingsService.myLetListings(req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Get my Listings successfully",
             data: result,
         });
     }
@@ -89,4 +107,5 @@ exports.ToLetListingsController = {
     getSingleToLetListings,
     updateToLetListings,
     deleteToLetListings,
+    myLetListings,
 };

@@ -50,6 +50,12 @@ const userSchema = new mongoose_1.Schema({
         enum: ["blocked", "active"],
         default: "active",
     },
+    listingHistory: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "ToLetListing",
+        },
+    ],
 }, {
     timestamps: true,
 });

@@ -60,7 +60,7 @@ const router = (0, express_1.Router)();
  */
 router.post("/login", (0, schemaValidation_1.default)(auth_validation_1.authValidation.loginValidationSchema), auth_controller_1.authController.login);
 router.post("/logout", auth_controller_1.authController.logOut);
-router.post("/refresh-token", (0, schemaValidation_1.default)(auth_validation_1.authValidation.refreshTokenValidationSchema), auth_controller_1.authController.login);
+router.post("/refresh-token", (0, schemaValidation_1.default)(auth_validation_1.authValidation.refreshTokenValidationSchema), auth_controller_1.authController.refreshToken);
 router.post("/change-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.changePasswordValidationSchema), auth_controller_1.authController.changePassword);
 router.post("/forget-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.forgetPasswordValidationSchema), auth_controller_1.authController.changePassword);
 router.post("/reset-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.resetPasswordValidationSchema), auth_controller_1.authController.changePassword);

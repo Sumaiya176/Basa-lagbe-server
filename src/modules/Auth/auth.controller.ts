@@ -85,8 +85,10 @@ const refreshToken = async (
 
     const { refreshToken } = result;
     res.cookie("refreshToken", refreshToken, {
-      secure: config.node_env === "production",
+      //secure: config.node_env === "production",
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
     });
 
     sendResponse(res, {

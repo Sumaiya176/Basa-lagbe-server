@@ -4,6 +4,7 @@ const express_1 = require("express");
 const user_route_1 = require("../modules/User/user.route");
 const auth_route_1 = require("../modules/Auth/auth.route");
 const ToLetListings_route_1 = require("../modules/ToLetListings/ToLetListings.route");
+const ContactMessage_route_1 = require("../modules/ContactMessage/ContactMessage.route");
 const router = (0, express_1.Router)();
 const allRoutes = [
     {
@@ -17,6 +18,10 @@ const allRoutes = [
     {
         path: "/listing",
         route: ToLetListings_route_1.ToLetListingsRouter,
+    },
+    {
+        path: "/contact",
+        route: ContactMessage_route_1.ContactMessageRouter,
     },
 ];
 allRoutes.forEach((routePath) => router.use(routePath.path, routePath.route));

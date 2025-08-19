@@ -78,8 +78,15 @@ const logOut = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
 });
 const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { refreshToken } = req.cookies;
-        const result = yield auth_service_1.authService.refreshToken(refreshToken);
+        const token = req.cookies.refreshToken;
+        const result = yield auth_service_1.authService.refreshToken(token);
+        const { refreshToken } = result;
+        res.cookie("refreshToken", refreshToken, {
+            //secure: config.node_env === "production",
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         (0, sendResponse_1.sendResponse)(res, {
             isSuccess: true,
             message: "Access token is retrieved successfully",

@@ -21,11 +21,11 @@ const auth = (...roles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const token = req.headers.authorization;
-            console.log(req.headers.authorization);
             if (!token) {
                 throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Your are not authorized");
             }
-            let decoded = (0, generateJwtToken_1.verifyToken)(token, config_1.default.jwt_access_secret);
+            console.log("from auth auth", req.headers.authorization);
+            let decoded = (0, generateJwtToken_1.verifyToken)(config_1.default.jwt_access_secret, token);
             // try {
             //   decoded = jwt.verify(
             //     token,
@@ -35,13 +35,14 @@ const auth = (...roles) => {
             //   throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
             // }
             const { id, role, iat } = decoded;
-            console.log(decoded);
+            console.log("id", id);
             const user = yield user_model_1.User.findById(id);
             if (!user)
                 throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
             if ((user === null || user === void 0 ? void 0 : user.status) === "blocked")
                 throw new AppError_1.default(http_status_1.default.FORBIDDEN, "User is blocked.");
-            if (roles && !roles.includes(role)) {
+            if (roles.length > 0 && roles.includes(role)) {
+                // console.log("from auth roles", roles, !roles.includes(role), user);
                 throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
             }
             const passwordUpdateTime = new Date(user === null || user === void 0 ? void 0 : user.passwordUpdatedAt).getTime() / 1000;

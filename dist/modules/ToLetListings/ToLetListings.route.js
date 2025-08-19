@@ -1,9 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ToLetListingsRouter = void 0;
 const express_1 = require("express");
+const cors_1 = __importDefault(require("cors"));
 const ToLetListings_controller_1 = require("./ToLetListings.controller");
 const ImageSendToCloudinary_1 = require("../../util/ImageSendToCloudinary");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
 const route = (0, express_1.Router)();
 /**
  * @swagger
@@ -249,7 +254,7 @@ const route = (0, express_1.Router)();
  *       404:
  *         description: Listing not found
  */
-route.post("/", ImageSendToCloudinary_1.upload.array("propertyImages", 10), 
+route.post("/", (0, auth_1.default)(), ImageSendToCloudinary_1.upload.array("propertyImages", 10), 
 // (req: Request, res: Response, next: NextFunction) => {
 //   console.log("hhjhj", req);
 //   req.body = JSON.parse(req.body);
@@ -258,8 +263,13 @@ route.post("/", ImageSendToCloudinary_1.upload.array("propertyImages", 10),
 // },
 //schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
 ToLetListings_controller_1.ToLetListingsController.createToLetListings);
-route.get("/", ToLetListings_controller_1.ToLetListingsController.getAllToLetListings);
+// --------------------- get my listings ----------------------
+route.get("/myListings", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.myLetListings);
+route.get("/", (0, cors_1.default)({
+    origin: ["https://basa-lagbe.vercel.app", "http://localhost:3000"],
+    credentials: true,
+}), ToLetListings_controller_1.ToLetListingsController.getAllToLetListings);
 route.get("/:id", ToLetListings_controller_1.ToLetListingsController.getSingleToLetListings);
-route.patch("/:id", ToLetListings_controller_1.ToLetListingsController.updateToLetListings);
-route.delete("/:id", ToLetListings_controller_1.ToLetListingsController.deleteToLetListings);
+route.patch("/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.updateToLetListings);
+route.delete("/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.deleteToLetListings);
 exports.ToLetListingsRouter = route;

@@ -50,5 +50,6 @@ const toLetListingSchema = new mongoose_1.Schema({
         type: [String],
         default: [],
     },
+    owner: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 exports.ToLetListing = (0, mongoose_1.model)("ToLetListing", toLetListingSchema);

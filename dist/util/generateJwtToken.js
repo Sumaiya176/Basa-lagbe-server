@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyToken = exports.generateToken = void 0;
 // backend/src/utils/jwt.ts
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = __importDefault(require("../config"));
 const AppError_1 = __importDefault(require("../Error/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
 const generateToken = (secret, payload, expiration) => {
@@ -16,9 +15,10 @@ exports.generateToken = generateToken;
 const verifyToken = (secret, token) => {
     let decoded;
     try {
-        decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
+        decoded = jsonwebtoken_1.default.verify(token, secret);
     }
     catch (err) {
+        // console.log("err from verify", err);
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
     }
     return decoded;

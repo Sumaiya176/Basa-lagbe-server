@@ -49,16 +49,17 @@ const globalErrorHandler = (err, req, res, next) => {
         errSource = [
             {
                 path: "",
-                message: err.message,
+                message,
             },
         ];
     }
     else if (err instanceof Error) {
-        message = err.message;
+        message = err.message || "Something went wrong";
+        console.log("from geh", err, "jjjjjjj", err.message);
         errSource = [
             {
                 path: "",
-                message: err.message,
+                message: message,
             },
         ];
     }

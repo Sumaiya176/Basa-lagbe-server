@@ -72,7 +72,10 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
         expiresIn: "10d",
     });
-    return { accessToken };
+    const refreshToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_refresh_secret, {
+        expiresIn: "30d",
+    });
+    return { accessToken, refreshToken };
 });
 // ~~~~~~~~~~~~~~~~~~~~~~~ Change Password ~~~~~~~~~~~~~~~~~~~~~~~
 const changePassword = (userInfo, payload) => __awaiter(void 0, void 0, void 0, function* () {

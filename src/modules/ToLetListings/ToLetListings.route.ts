@@ -275,7 +275,9 @@ route.post(
 );
 // --------------------- get my listings ----------------------
 route.get("/myListings", auth(), ToLetListingsController.myLetListings);
-route.get("/", ToLetListingsController.getAllToLetListings);
+route.get("/", (req, res) => {
+  res.json({ message: "Hello from backend" });
+});
 route.get("/:id", ToLetListingsController.getSingleToLetListings);
 route.patch("/:id", auth(), ToLetListingsController.updateToLetListings);
 route.delete("/:id", auth(), ToLetListingsController.deleteToLetListings);

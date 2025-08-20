@@ -16,7 +16,6 @@ const auth = (...roles: TUserRole[]) => {
         throw new AppError(httpStatus.UNAUTHORIZED, "Your are not authorized");
       }
 
-      console.log("from auth auth", req.headers.authorization);
       let decoded: JwtPayload = verifyToken(
         config.jwt_access_secret as string,
         token
@@ -31,7 +30,6 @@ const auth = (...roles: TUserRole[]) => {
       // }
 
       const { id, role, iat } = decoded;
-      console.log("id", id);
 
       const user = await User.findById(id);
 

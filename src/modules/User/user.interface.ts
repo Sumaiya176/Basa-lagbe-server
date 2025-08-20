@@ -8,6 +8,7 @@ export interface IUser {
   passwordUpdatedAt?: Date | null;
   role: "user" | "admin" | "superAdmin";
   status: "blocked" | "active";
+  savedProperty: [Types.ObjectId];
   listingHistory: [Types.ObjectId];
 }
 

@@ -284,6 +284,17 @@ route.get(
   }),
   ToLetListingsController.getAllToLetListings
 );
+route.post(
+  "/savedProperty",
+  auth(),
+  ToLetListingsController.createSavedProperty
+);
+route.get("/savedProperty", auth(), ToLetListingsController.getSavedProperty);
+route.delete(
+  "/savedProperty/:id",
+  auth(),
+  ToLetListingsController.removeSavedProperty
+);
 route.get("/:id", ToLetListingsController.getSingleToLetListings);
 route.patch("/:id", auth(), ToLetListingsController.updateToLetListings);
 route.delete("/:id", auth(), ToLetListingsController.deleteToLetListings);

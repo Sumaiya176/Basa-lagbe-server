@@ -138,6 +138,76 @@ const myLetListings = async (
   }
 };
 
+const createSavedProperty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.body;
+    const result = await ToLetListingsService.createSavedProperty(
+      id,
+      req.user as TDecodedUser
+    );
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Property Saved !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const getSavedProperty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await ToLetListingsService.getSavedProperty(
+      req.user as TDecodedUser
+    );
+
+    console.log(result);
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Retrieved Saved Property !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const removeSavedProperty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log("body");
+    const { id } = req.params;
+    const result = await ToLetListingsService.removeSavedProperty(
+      id,
+      req.user as TDecodedUser
+    );
+
+    console.log(result);
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Removed from Saved Property !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 export const ToLetListingsController = {
   createToLetListings,
   getAllToLetListings,
@@ -145,4 +215,7 @@ export const ToLetListingsController = {
   updateToLetListings,
   deleteToLetListings,
   myLetListings,
+  createSavedProperty,
+  getSavedProperty,
+  removeSavedProperty,
 };

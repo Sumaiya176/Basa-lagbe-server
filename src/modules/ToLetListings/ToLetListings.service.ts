@@ -144,6 +144,44 @@ const myLetListings = async (user: TDecodedUser) => {
   return result;
 };
 
+const createSavedProperty = async (id: string, user: TDecodedUser) => {
+  const result = await User.findByIdAndUpdate(
+    user.id,
+    { $push: { savedProperty: id } },
+    { new: true }
+  );
+
+  if (!result) {
+    throw new Error("Property failed to save");
+  }
+
+  return result;
+};
+
+const getSavedProperty = async (user: TDecodedUser) => {
+  const result = await User.findById(user.id).populate("savedProperty");
+
+  if (!result) {
+    throw new Error("Failed to retrieve saved property");
+  }
+
+  return result.savedProperty;
+};
+
+const removeSavedProperty = async (id: string, user: TDecodedUser) => {
+  const result = await User.findByIdAndUpdate(
+    user.id,
+    { $pull: { savedProperty: id } },
+    { new: true }
+  );
+  console.log("from service", id, result);
+  if (!result) {
+    throw new Error("Property failed to remove");
+  }
+
+  return result.savedProperty;
+};
+
 export const ToLetListingsService = {
   createToLetListings,
   getAllToLetListings,
@@ -151,4 +189,7 @@ export const ToLetListingsService = {
   updateToLetListings,
   deleteToLetListings,
   myLetListings,
+  createSavedProperty,
+  getSavedProperty,
+  removeSavedProperty,
 };

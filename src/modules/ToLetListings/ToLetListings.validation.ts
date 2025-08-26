@@ -41,6 +41,9 @@ const createToLetListingValidationSchema = z.object({
       })
       .min(1, "Availability cannot be empty"),
 
+    floor: z.string({
+      required_error: "Floor is required",
+    }),
     description: z.string().optional(),
 
     street: z.string().optional(),
@@ -63,6 +66,11 @@ const createToLetListingValidationSchema = z.object({
       })
       .min(1, "Area cannot be empty"),
 
+    location: z.object({
+      address: z.string(),
+      latitude: z.number(),
+      longitude: z.number(),
+    }),
     rent: z
       .number({
         required_error: "Rent amount is required",

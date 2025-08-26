@@ -3,6 +3,15 @@ import { IUser } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status";
 
+const getAllUser = async () => {
+  const result = await User.find();
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "No user found");
+  }
+
+  return result;
+};
+
 const createUser = async (payload: IUser) => {
   const isUserExist = await User.findOne({ email: payload?.email });
   if (isUserExist) {
@@ -35,6 +44,7 @@ const updateProfile = async (userId: string, payload: Partial<IUser>) => {
 };
 
 export const userService = {
+  getAllUser,
   createUser,
   updateProfile,
 };

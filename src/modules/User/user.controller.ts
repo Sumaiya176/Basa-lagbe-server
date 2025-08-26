@@ -2,6 +2,20 @@ import { RequestHandler } from "express";
 import { userService } from "./user.service";
 import { sendResponse } from "../../util/sendResponse";
 
+const getAllUser: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await userService.getAllUser();
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Retrieved all users successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
 const createUser: RequestHandler = async (req, res, next) => {
   try {
     console.log(req.body);
@@ -36,6 +50,7 @@ const updateProfile: RequestHandler = async (req, res, next) => {
 };
 
 export const userController = {
+  getAllUser,
   createUser,
   updateProfile,
 };

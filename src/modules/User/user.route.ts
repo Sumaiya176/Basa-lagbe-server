@@ -108,6 +108,8 @@ const router = Router();
  *
  *
  * */
+
+router.get("/", auth("admin"), userController.getAllUser);
 router.post(
   "/",
   schemaValidation(userValidation.createUserValidationSchema),

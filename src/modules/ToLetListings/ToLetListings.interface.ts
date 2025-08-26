@@ -7,11 +7,17 @@ export type TToLetListings = {
   balcony: number;
   size?: number;
   availability: string;
+  floor: number;
   description?: string;
   street?: string;
   city: string;
   district: string;
   area: string;
+  location: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
   rent: number;
   advance: number;
   noticePeriod: number;

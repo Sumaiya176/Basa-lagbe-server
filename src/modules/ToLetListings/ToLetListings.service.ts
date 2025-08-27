@@ -12,6 +12,7 @@ const createToLetListings = async (
   payload: TToLetListings,
   user: TDecodedUser
 ) => {
+  console.log("payload", payload);
   if (files && files.length) {
     const imageUrls: string[] = [];
 

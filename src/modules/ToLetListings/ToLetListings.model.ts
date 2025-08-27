@@ -15,21 +15,12 @@ const toLetListingSchema = new Schema<TToLetListings>(
     availability: { type: String, required: true },
     floor: { type: Number, required: true },
     description: { type: String },
-    street: { type: String },
-    city: { type: String, required: true },
+    address: { type: String },
+    thana: { type: String, required: true },
     district: { type: String, required: true },
-    area: { type: String, required: true },
-    location: {
-      address: {
-        type: String,
-      },
-      latitude: {
-        type: Number,
-      },
-      longitude: {
-        type: Number,
-      },
-    },
+    division: { type: String, required: true },
+    latitude: { type: Number },
+    longitude: { type: Number },
     rent: { type: Number, required: true },
     advance: { type: Number, required: true },
     noticePeriod: { type: Number, required: true },

@@ -46,31 +46,27 @@ const createToLetListingValidationSchema = z.object({
     }),
     description: z.string().optional(),
 
-    street: z.string().optional(),
+    address: z.string(),
 
-    city: z
+    thana: z
       .string({
-        required_error: "City is required",
+        required_error: "Thana is required",
       })
-      .min(1, "City cannot be empty"),
+      .min(1, "Thana cannot be empty"),
 
     district: z
       .string({
         required_error: "District is required",
       })
       .min(1, "District cannot be empty"),
-
-    area: z
+    division: z
       .string({
-        required_error: "Area is required",
+        required_error: "District is required",
       })
-      .min(1, "Area cannot be empty"),
+      .min(1, "District cannot be empty"),
+    latitude: z.number(),
+    longitude: z.number(),
 
-    location: z.object({
-      address: z.string(),
-      latitude: z.number(),
-      longitude: z.number(),
-    }),
     rent: z
       .number({
         required_error: "Rent amount is required",

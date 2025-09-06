@@ -12,6 +12,15 @@ const getAllUser = async () => {
   return result;
 };
 
+const getSingleUser = async (id: string) => {
+  const result = await User.findOne({ _id: id });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "No user found");
+  }
+
+  return result;
+};
+
 const createUser = async (payload: IUser) => {
   const isUserExist = await User.findOne({ email: payload?.email });
   if (isUserExist) {
@@ -45,6 +54,7 @@ const updateProfile = async (userId: string, payload: Partial<IUser>) => {
 
 export const userService = {
   getAllUser,
+  getSingleUser,
   createUser,
   updateProfile,
 };

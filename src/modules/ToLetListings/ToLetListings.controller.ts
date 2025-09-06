@@ -20,8 +20,6 @@ const createToLetListings = async (
       throw new Error("Listings not created");
     }
 
-    console.log("from listings controller", result);
-
     sendResponse(res, {
       isSuccess: true,
       message: "To-let Listings just created successfully",
@@ -171,7 +169,6 @@ const getSavedProperty = async (
       req.user as TDecodedUser
     );
 
-    console.log(result);
     sendResponse(res, {
       isSuccess: true,
       message: "Retrieved Saved Property !!",
@@ -189,9 +186,75 @@ const removeSavedProperty = async (
   next: NextFunction
 ) => {
   try {
-    console.log("body");
     const { id } = req.params;
     const result = await ToLetListingsService.removeSavedProperty(
+      id,
+      req.user as TDecodedUser
+    );
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Removed from Saved Property !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const createRecentlyViewed = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.body;
+    const result = await ToLetListingsService.createRecentlyViewed(
+      id,
+      req.user as TDecodedUser
+    );
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Recently viewed property Saved !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const getViewedProperty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await ToLetListingsService.getViewedProperty(
+      req.user as TDecodedUser
+    );
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Retrieved Viewed Property !!",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const removeViewedProperty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const result = await ToLetListingsService.removeViewedProperty(
       id,
       req.user as TDecodedUser
     );
@@ -199,7 +262,7 @@ const removeSavedProperty = async (
     console.log(result);
     sendResponse(res, {
       isSuccess: true,
-      message: "Removed from Saved Property !!",
+      message: "Removed from Viewed Property !!",
       data: result,
     });
   } catch (err) {
@@ -218,4 +281,7 @@ export const ToLetListingsController = {
   createSavedProperty,
   getSavedProperty,
   removeSavedProperty,
+  createRecentlyViewed,
+  getViewedProperty,
+  removeViewedProperty,
 };

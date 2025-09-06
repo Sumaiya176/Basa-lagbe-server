@@ -295,6 +295,17 @@ route.delete(
   auth(),
   ToLetListingsController.removeSavedProperty
 );
+route.post(
+  "/recentlyViewed",
+  auth(),
+  ToLetListingsController.createRecentlyViewed
+);
+route.get("/recentlyViewed", auth(), ToLetListingsController.getViewedProperty);
+route.delete(
+  "/recentlyViewed/:id",
+  auth(),
+  ToLetListingsController.removeViewedProperty
+);
 route.get("/:id", ToLetListingsController.getSingleToLetListings);
 route.patch("/:id", auth(), ToLetListingsController.updateToLetListings);
 route.delete("/:id", auth(), ToLetListingsController.deleteToLetListings);

@@ -10,6 +10,7 @@ export interface IUser {
   status: "blocked" | "active";
   savedProperty: [Types.ObjectId];
   listingHistory: [Types.ObjectId];
+  recentlyViewed: [Types.ObjectId];
 }
 
 export type TDecodedUser = {

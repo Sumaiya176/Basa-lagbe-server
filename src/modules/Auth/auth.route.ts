@@ -3,6 +3,7 @@ import { authController } from "./auth.controller";
 import schemaValidation from "../../middlewares/schemaValidation";
 import { authValidation } from "./auth.validation";
 import passport from "passport";
+import auth from "../../middlewares/auth";
 
 const router = Router();
 
@@ -83,6 +84,11 @@ router.post(
   "/reset-password",
   schemaValidation(authValidation.resetPasswordValidationSchema),
   authController.changePassword
+);
+router.patch(
+  "/edit-profile",
+  auth("user", "admin", "superAdmin"),
+  authController.editProfile
 );
 
 // GitHub OAuth

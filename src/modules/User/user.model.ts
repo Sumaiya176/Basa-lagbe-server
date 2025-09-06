@@ -50,6 +50,12 @@ const userSchema = new Schema<IUser>(
         ref: "ToLetListing",
       },
     ],
+    recentlyViewed: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ToLetListing",
+      },
+    ],
   },
   {
     timestamps: true,

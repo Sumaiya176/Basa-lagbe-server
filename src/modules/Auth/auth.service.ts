@@ -9,7 +9,7 @@ import sendEmail from "../../util/sendEmail";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~ Login Service ~~~~~~~~~~~~~~~~~~~~~~~~~~
 const login = async (payload: TUser) => {
-  console.log(payload);
+  console.log("payload", payload);
   const isUserExists = await User.findOne({ email: payload?.email }).select(
     "+password"
   );
@@ -32,6 +32,7 @@ const login = async (payload: TUser) => {
     throw new AppError(httpStatus.FORBIDDEN, "Wrong Password");
 
   const jwtPayload = {
+    name: isUserExists?.userName,
     id: isUserExists?._id,
     email: isUserExists?.email,
     role: isUserExists?.role,
@@ -76,6 +77,7 @@ const refreshToken = async (token: string) => {
   }
 
   const jwtPayload = {
+    name: user?.userName,
     id: user?._id,
     email: user?.email,
     role: user?.role,
@@ -147,6 +149,7 @@ const forgetPassword = async (id: string) => {
   }
 
   const jwtPayload = {
+    name: user?.userName,
     id: user?._id,
     email: user?.email,
     role: user?.role,
@@ -163,10 +166,14 @@ const forgetPassword = async (id: string) => {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~ Reset Password ~~~~~~~~~~~~~~~~~~~~~~~
 const resetPassword = async (
-  { id, newPassword }: { id: string; newPassword: string },
+  {
+    id,
+    newPassword,
+    oldPassword,
+  }: { id: string; newPassword: string; oldPassword: string },
   token: string
 ) => {
-  const user = await User.findById(id);
+  const user = await User.findById(id).select("+password");
   // ---- checking if the user is exist ------
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User is not found!!");
@@ -175,6 +182,12 @@ const resetPassword = async (
   // ----- checking if the user is blocked or not -----
   if (user.status === "blocked") {
     throw new AppError(httpStatus.FORBIDDEN, "The user is blocked");
+  }
+
+  const comparedPassword = bcrypt.compare(oldPassword, user.password as string);
+
+  if (!comparedPassword) {
+    throw new AppError(httpStatus.FORBIDDEN, "Your old password is wrong");
   }
 
   const decoded = jwt.verify(
@@ -200,10 +213,38 @@ const resetPassword = async (
   );
 };
 
+// ~~~~~~~~~~~~~~~~~~~~~~~ edit profile ~~~~~~~~~~~~~~~~~~~~~~~
+const editProfile = async (
+  body: {
+    email?: string;
+    password?: string;
+  },
+  id: string
+) => {
+  const user = await User.findById(id);
+  // ---- checking if the user is not exist ------
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User is not found!!");
+  }
+
+  // ----- checking if the user is blocked or not -----
+  if (user.status === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "The user is blocked");
+  }
+
+  const result = await User.findByIdAndUpdate(id, body, {
+    new: true,
+    runValidators: true,
+  });
+
+  return result;
+};
+
 export const authService = {
   login,
   refreshToken,
   changePassword,
   forgetPassword,
   resetPassword,
+  editProfile,
 };

@@ -109,7 +109,12 @@ const router = Router();
  *
  * */
 
-router.get("/", auth("admin"), userController.getAllUser);
+router.get("/", auth("admin", "superAdmin"), userController.getAllUser);
+router.get(
+  "/getSingleUser",
+  auth("user", "admin", "superAdmin"),
+  userController.getSingleUser
+);
 router.post(
   "/",
   schemaValidation(userValidation.createUserValidationSchema),
@@ -117,7 +122,7 @@ router.post(
 );
 router.patch(
   "/updateProfile/:id",
-  auth("admin", "user"),
+  auth("admin", "user", "superAdmin"),
   schemaValidation(userValidation.updateUserProfileValidationSchema),
   userController.updateProfile
 );

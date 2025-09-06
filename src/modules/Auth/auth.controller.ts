@@ -8,7 +8,6 @@ import { User } from "../User/user.model";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("hello from login", req.body);
     const result = await authService.login(req.body);
 
     const { refreshToken } = result;
@@ -48,7 +47,6 @@ const OAuthLoginSuccess = (req: Request, res: Response) => {
 
 // ------------ user logout ------------
 const logOut = async (req: Request, res: Response, next: NextFunction) => {
-  console.log("hekki");
   try {
     // const token = req.cookies.refreshToken;
     // if (token) {
@@ -163,6 +161,23 @@ const resetPassword = async (
   }
 };
 
+const editProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.user as JwtPayload;
+    console.log("user id", id);
+    const result = await authService.editProfile(req.body, id);
+
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Profile edited successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 export const authController = {
   login,
   logOut,
@@ -171,4 +186,5 @@ export const authController = {
   forgetPassword,
   resetPassword,
   OAuthLoginSuccess,
+  editProfile,
 };

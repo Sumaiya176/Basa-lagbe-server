@@ -183,6 +183,43 @@ const removeSavedProperty = async (id: string, user: TDecodedUser) => {
   return result.savedProperty;
 };
 
+const createRecentlyViewed = async (id: string, user: TDecodedUser) => {
+  const result = await User.findByIdAndUpdate(
+    user.id,
+    { $push: { recentlyViewed: id } },
+    { new: true }
+  );
+
+  if (!result) {
+    throw new Error("Recently viewed property failed to save");
+  }
+
+  return result;
+};
+
+const getViewedProperty = async (user: TDecodedUser) => {
+  const result = await User.findById(user.id).populate("recentlyViewed");
+
+  if (!result) {
+    throw new Error("Failed to retrieve viewed property");
+  }
+
+  return result.recentlyViewed;
+};
+
+const removeViewedProperty = async (id: string, user: TDecodedUser) => {
+  const result = await User.findByIdAndUpdate(
+    user.id,
+    { $pull: { recentlyViewed: id } },
+    { new: true }
+  );
+  if (!result) {
+    throw new Error("Property failed to remove");
+  }
+
+  return result.recentlyViewed;
+};
+
 export const ToLetListingsService = {
   createToLetListings,
   getAllToLetListings,
@@ -193,4 +230,7 @@ export const ToLetListingsService = {
   createSavedProperty,
   getSavedProperty,
   removeSavedProperty,
+  createRecentlyViewed,
+  getViewedProperty,
+  removeViewedProperty,
 };

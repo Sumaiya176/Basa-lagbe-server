@@ -12,8 +12,6 @@ const auth = (...roles: TUserRole[]) => {
     try {
       const token = req.headers.authorization;
 
-      console.log("token", token);
-
       if (!token) {
         throw new AppError(httpStatus.UNAUTHORIZED, "Your are not authorized");
       }
@@ -35,14 +33,11 @@ const auth = (...roles: TUserRole[]) => {
 
       const user = await User.findById(id);
 
-      console.log("user", user);
-
       if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found.");
       if (user?.status === "blocked")
         throw new AppError(httpStatus.FORBIDDEN, "User is blocked.");
 
       if (roles.length > 0 && !roles.includes(role)) {
-        console.log("from auth roles", roles, roles.includes(role));
         throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
       }
 
@@ -53,7 +48,6 @@ const auth = (...roles: TUserRole[]) => {
         throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
       }
 
-      console.log("from auth roles from auth roles");
       req.user = decoded as JwtPayload;
       next();
     } catch (err) {

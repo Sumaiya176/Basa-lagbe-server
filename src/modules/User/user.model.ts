@@ -40,8 +40,14 @@ const userSchema = new Schema<IUser>(
     },
     savedProperty: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "ToLetListing",
+        listingId: {
+          type: Schema.Types.ObjectId,
+          ref: "ToLetListing",
+        },
+        savedAt: {
+          type: Date,
+          required: true,
+        },
       },
     ],
     listingHistory: [
@@ -52,8 +58,14 @@ const userSchema = new Schema<IUser>(
     ],
     recentlyViewed: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "ToLetListing",
+        listingId: {
+          type: Schema.Types.ObjectId,
+          ref: "ToLetListing",
+        },
+        savedAt: {
+          type: Date,
+          required: true,
+        },
       },
     ],
   },

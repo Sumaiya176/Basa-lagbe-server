@@ -6,6 +6,7 @@ import { ImageSendToCloudinary } from "../../util/ImageSendToCloudinary";
 import mongoose from "mongoose";
 import { User } from "../User/user.model";
 import { TDecodedUser } from "../User/user.interface";
+const { ObjectId } = require("mongodb");
 
 const createToLetListings = async (
   files: any,
@@ -146,9 +147,33 @@ const myLetListings = async (user: TDecodedUser) => {
 };
 
 const createSavedProperty = async (id: string, user: TDecodedUser) => {
+  const userListing = await User.findById(user.id).populate({
+    path: "savedProperty",
+    populate: {
+      path: "listingId",
+    },
+  });
+
+  if (userListing?.savedProperty) {
+    for (const listing of userListing?.savedProperty) {
+      if (new ObjectId(listing.listingId).toString() === id) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          "Item is already in saved list!!"
+        );
+        break;
+      }
+    }
+  }
+
+  const data = {
+    listingId: id,
+    savedAt: new Date(),
+  };
+
   const result = await User.findByIdAndUpdate(
     user.id,
-    { $push: { savedProperty: id } },
+    { $push: { savedProperty: data } },
     { new: true }
   );
 
@@ -160,7 +185,12 @@ const createSavedProperty = async (id: string, user: TDecodedUser) => {
 };
 
 const getSavedProperty = async (user: TDecodedUser) => {
-  const result = await User.findById(user.id).populate("savedProperty");
+  const result = await User.findById(user.id).populate({
+    path: "savedProperty",
+    populate: {
+      path: "listingId",
+    },
+  });
 
   if (!result) {
     throw new Error("Failed to retrieve saved property");
@@ -175,7 +205,7 @@ const removeSavedProperty = async (id: string, user: TDecodedUser) => {
     { $pull: { savedProperty: id } },
     { new: true }
   );
-  console.log("from service", id, result);
+
   if (!result) {
     throw new Error("Property failed to remove");
   }
@@ -184,14 +214,32 @@ const removeSavedProperty = async (id: string, user: TDecodedUser) => {
 };
 
 const createRecentlyViewed = async (id: string, user: TDecodedUser) => {
+  const userListing = await User.findById(user.id);
+  if (userListing?.recentlyViewed) {
+    for (const listing of userListing?.recentlyViewed) {
+      if (new ObjectId(listing.listingId).toString() === id) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          "Item is already in viewed list!!"
+        );
+        break;
+      }
+    }
+  }
+
+  const data = {
+    listingId: id,
+    savedAt: new Date(),
+  };
+
   const result = await User.findByIdAndUpdate(
     user.id,
-    { $push: { recentlyViewed: id } },
+    { $push: { recentlyViewed: data } },
     { new: true }
   );
 
   if (!result) {
-    throw new Error("Recently viewed property failed to save");
+    throw new Error("Property failed to save");
   }
 
   return result;

@@ -1,5 +1,9 @@
 import { Types } from "mongoose";
 
+type savedProperty = {
+  listingId: Types.ObjectId;
+  savedAt: Date;
+};
 export interface IUser {
   userName: string;
   email: string;
@@ -8,9 +12,9 @@ export interface IUser {
   passwordUpdatedAt?: Date | null;
   role: "user" | "admin" | "superAdmin";
   status: "blocked" | "active";
-  savedProperty: [Types.ObjectId];
+  savedProperty: savedProperty[];
   listingHistory: [Types.ObjectId];
-  recentlyViewed: [Types.ObjectId];
+  recentlyViewed: savedProperty[];
 }
 
 export type TDecodedUser = {

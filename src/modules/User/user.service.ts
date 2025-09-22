@@ -2,6 +2,8 @@ import AppError from "../../Error/AppError";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status";
+import jwt from "jsonwebtoken";
+import config from "../../config";
 
 const getAllUser = async () => {
   const result = await User.find();
@@ -32,6 +34,40 @@ const createUser = async (payload: IUser) => {
     throw new Error("Failed to register new user");
   }
 
+  let jwtPayload = {
+    name: result.userName,
+    id: result._id,
+    email: result.email,
+    role: result.role,
+  };
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: "10d",
+  });
+
+  console.log(accessToken);
+  const refreshToken = jwt.sign(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    {
+      expiresIn: "30d",
+    }
+  );
+
+  return { accessToken, refreshToken, result };
+};
+
+const createAdmin = async (payload: IUser) => {
+  const admin = { ...payload, provider: "credentials" };
+  const isUserExist = await User.findOne({ email: payload?.email });
+  if (isUserExist) {
+    throw new AppError(httpStatus.CONFLICT, "User is already exists");
+  }
+  const result = await User.create(admin);
+
+  if (!result) {
+    throw new Error("Failed to register new user");
+  }
+
   return result;
 };
 
@@ -56,5 +92,6 @@ export const userService = {
   getAllUser,
   getSingleUser,
   createUser,
+  createAdmin,
   updateProfile,
 };

@@ -120,6 +120,12 @@ router.post(
   schemaValidation(userValidation.createUserValidationSchema),
   userController.createUser
 );
+router.post(
+  "/createAdmin",
+  auth("superAdmin"),
+  schemaValidation(userValidation.createUserValidationSchema),
+  userController.createAdmin
+);
 router.patch(
   "/updateProfile/:id",
   auth("admin", "user", "superAdmin"),

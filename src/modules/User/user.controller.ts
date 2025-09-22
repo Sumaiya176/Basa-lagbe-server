@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { userService } from "./user.service";
 import { sendResponse } from "../../util/sendResponse";
 import { TDecodedUser } from "./user.interface";
+import config from "../../config";
 
 const getAllUser: RequestHandler = async (req, res, next) => {
   try {
@@ -38,12 +39,28 @@ const getSingleUser: RequestHandler = async (req, res, next) => {
 };
 const createUser: RequestHandler = async (req, res, next) => {
   try {
-    console.log(req.body);
     const result = await userService.createUser(req.body);
-
+    const { refreshToken } = result;
+    res.cookie("refreshToken", refreshToken, {
+      secure: config.node_env === "production",
+      httpOnly: true,
+    });
     sendResponse(res, {
       isSuccess: true,
       message: "User created successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+const createAdmin: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await userService.createAdmin(req.body);
+    sendResponse(res, {
+      isSuccess: true,
+      message: "Admin created successfully",
       data: result,
     });
   } catch (err) {
@@ -73,5 +90,6 @@ export const userController = {
   getAllUser,
   getSingleUser,
   createUser,
+  createAdmin,
   updateProfile,
 };

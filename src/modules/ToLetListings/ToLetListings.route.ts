@@ -265,10 +265,10 @@ route.post(
   auth(),
   upload.array("propertyImages", 10),
   // (req: Request, res: Response, next: NextFunction) => {
-  //   console.log("hhjhj", req);
+  //   console.log("hhjhj");
 
   //   req.body = JSON.parse(req.body);
-  //   console.log(req.body);
+  //   console.log("body", req.body);
   //   next();
   // },
   //schemaValidation(toLetListingValidation.createToLetListingValidationSchema),

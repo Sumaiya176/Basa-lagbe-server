@@ -1,7 +1,7 @@
 import config from "../config";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
-import fs from "fs";
+import streamifier from "streamifier";
 import { UploadApiResponse } from "cloudinary";
 
 cloudinary.config({
@@ -10,39 +10,25 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
+// ✅ Upload buffer directly to Cloudinary (no local disk)
 export const ImageSendToCloudinary = (
   imageName: string,
-  path: string
-): Promise<Record<string, unknown>> => {
+  buffer: Buffer
+): Promise<UploadApiResponse> => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(
-      path,
-      { public_id: imageName.trim() },
-      function (error, result) {
-        if (error) {
-          reject(error);
-        }
-        resolve(result as UploadApiResponse);
-        fs.unlink(path, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log("File is deleted");
-          }
-        });
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { public_id: imageName.trim(), folder: "propertyImages" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result as UploadApiResponse);
       }
     );
+
+    // Convert buffer to a readable stream
+    streamifier.createReadStream(buffer).pipe(uploadStream);
   });
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, process.cwd() + "/uploads/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix);
-  },
-});
-
-export const upload = multer({ storage: storage });
+// ✅ Use memory storage (no files on disk)
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });

@@ -13,11 +13,13 @@ const createToLetListings = async (
   payload: TToLetListings,
   user: TDecodedUser
 ) => {
-  //console.log("payload", payload, files);
+  console.log("payload", payload, files);
   if (files && files.length) {
     const imageUrls: string[] = [];
 
     for (const file of files) {
+      console.log("File object:", file, "file");
+
       const imageName = `${payload.ownerName}-${Date.now()}`;
       const { secure_url } = await ImageSendToCloudinary(
         imageName,
@@ -25,6 +27,7 @@ const createToLetListings = async (
       );
       imageUrls.push(secure_url);
     }
+
     payload.propertyImages = imageUrls;
   }
 
@@ -67,6 +70,7 @@ const createToLetListings = async (
   }
 };
 
+//  -------------- get all listings ----------------------
 const getAllToLetListings = async () => {
   return await ToLetListing.find();
 };

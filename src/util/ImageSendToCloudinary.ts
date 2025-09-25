@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
-// ✅ Upload buffer to Cloudinary using Node built-in Readable
+// ✅ Upload from buffer
 export const ImageSendToCloudinary = (
   imageName: string,
   buffer: Buffer
@@ -28,6 +28,6 @@ export const ImageSendToCloudinary = (
   });
 };
 
-// ✅ Use memory storage only (no disk)
+// ✅ Multer: memory storage only
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });

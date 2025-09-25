@@ -18,9 +18,11 @@ const createToLetListings = async (
     const imageUrls: string[] = [];
 
     for (const file of files) {
-      const imageName = `${payload.ownerName}${Date.now()}`;
-      const { buffer } = file; // ✅ from memory storage
-      const { secure_url } = await ImageSendToCloudinary(imageName, buffer);
+      const imageName = `${payload.ownerName}-${Date.now()}`;
+      const { secure_url } = await ImageSendToCloudinary(
+        imageName,
+        file.buffer
+      );
       imageUrls.push(secure_url);
     }
     payload.propertyImages = imageUrls;

@@ -1,8 +1,7 @@
 import config from "../config";
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import multer from "multer";
-import streamifier from "streamifier";
-import { UploadApiResponse } from "cloudinary";
+import { Readable } from "stream";
 
 cloudinary.config({
   cloud_name: config.cloudinary_cloud_name,
@@ -10,7 +9,7 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
-// ✅ Upload buffer directly to Cloudinary (no local disk)
+// ✅ Upload buffer to Cloudinary using Node built-in Readable
 export const ImageSendToCloudinary = (
   imageName: string,
   buffer: Buffer
@@ -19,16 +18,16 @@ export const ImageSendToCloudinary = (
     const uploadStream = cloudinary.uploader.upload_stream(
       { public_id: imageName.trim(), folder: "propertyImages" },
       (error, result) => {
-        if (error) reject(error);
-        else resolve(result as UploadApiResponse);
+        if (error) return reject(error);
+        if (!result) return reject(new Error("Cloudinary result is empty"));
+        resolve(result);
       }
     );
 
-    // Convert buffer to a readable stream
-    streamifier.createReadStream(buffer).pipe(uploadStream);
+    Readable.from(buffer).pipe(uploadStream);
   });
 };
 
-// ✅ Use memory storage (no files on disk)
+// ✅ Use memory storage only (no disk)
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });

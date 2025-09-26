@@ -18,7 +18,6 @@ const auth_service_1 = require("./auth.service");
 const config_1 = __importDefault(require("../../config"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("hello from login", req.body);
         const result = yield auth_service_1.authService.login(req.body);
         const { refreshToken } = result;
         res.cookie("refreshToken", refreshToken, {
@@ -52,7 +51,6 @@ const OAuthLoginSuccess = (req, res) => {
 };
 // ------------ user logout ------------
 const logOut = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("hekki");
     try {
         // const token = req.cookies.refreshToken;
         // if (token) {
@@ -141,6 +139,22 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(err);
     }
 });
+const editProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.user;
+        console.log("user id", id);
+        const result = yield auth_service_1.authService.editProfile(req.body, id);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Profile edited successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
 exports.authController = {
     login,
     logOut,
@@ -149,4 +163,5 @@ exports.authController = {
     forgetPassword,
     resetPassword,
     OAuthLoginSuccess,
+    editProfile,
 };

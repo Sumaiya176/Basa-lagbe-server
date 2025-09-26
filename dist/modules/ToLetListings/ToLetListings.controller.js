@@ -18,7 +18,6 @@ const createToLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0
         if (!result) {
             throw new Error("Listings not created");
         }
-        console.log("from listings controller", result);
         (0, sendResponse_1.sendResponse)(res, {
             isSuccess: true,
             message: "To-let Listings just created successfully",
@@ -101,6 +100,95 @@ const myLetListings = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(err);
     }
 });
+const createSavedProperty = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.body;
+        const result = yield ToLetListings_service_1.ToLetListingsService.createSavedProperty(id, req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Property Saved !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const getSavedProperty = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield ToLetListings_service_1.ToLetListingsService.getSavedProperty(req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Retrieved Saved Property !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const removeSavedProperty = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield ToLetListings_service_1.ToLetListingsService.removeSavedProperty(id, req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Removed from Saved Property !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const createRecentlyViewed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.body;
+        const result = yield ToLetListings_service_1.ToLetListingsService.createRecentlyViewed(id, req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Recently viewed property Saved !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const getViewedProperty = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield ToLetListings_service_1.ToLetListingsService.getViewedProperty(req.user);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Retrieved Viewed Property !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+const removeViewedProperty = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield ToLetListings_service_1.ToLetListingsService.removeViewedProperty(id, req.user);
+        console.log(result);
+        (0, sendResponse_1.sendResponse)(res, {
+            isSuccess: true,
+            message: "Removed from Viewed Property !!",
+            data: result,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
 exports.ToLetListingsController = {
     createToLetListings,
     getAllToLetListings,
@@ -108,4 +196,10 @@ exports.ToLetListingsController = {
     updateToLetListings,
     deleteToLetListings,
     myLetListings,
+    createSavedProperty,
+    getSavedProperty,
+    removeSavedProperty,
+    createRecentlyViewed,
+    getViewedProperty,
+    removeViewedProperty,
 };

@@ -19,13 +19,15 @@ const ToLetListings_model_1 = require("./ToLetListings.model");
 const ImageSendToCloudinary_1 = require("../../util/ImageSendToCloudinary");
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = require("../User/user.model");
+const { ObjectId } = require("mongodb");
 const createToLetListings = (files, payload, user) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("payload", payload, files);
     if (files && files.length) {
         const imageUrls = [];
         for (const file of files) {
-            const imageName = `${payload.ownerName}${Date.now()}`;
-            const path = file.path;
-            const { secure_url } = yield (0, ImageSendToCloudinary_1.ImageSendToCloudinary)(imageName, path);
+            console.log("File object:", file, "file");
+            const imageName = `${payload.ownerName}-${Date.now()}`;
+            const { secure_url } = yield (0, ImageSendToCloudinary_1.ImageSendToCloudinary)(imageName, file.buffer);
             imageUrls.push(secure_url);
         }
         payload.propertyImages = imageUrls;
@@ -55,6 +57,7 @@ const createToLetListings = (files, payload, user) => __awaiter(void 0, void 0, 
         throw new Error();
     }
 });
+//  -------------- get all listings ----------------------
 const getAllToLetListings = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield ToLetListings_model_1.ToLetListing.find();
 });
@@ -113,6 +116,84 @@ const myLetListings = (user) => __awaiter(void 0, void 0, void 0, function* () {
     }
     return result;
 });
+const createSavedProperty = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const userListing = yield user_model_1.User.findById(user.id).populate({
+        path: "savedProperty",
+        populate: {
+            path: "listingId",
+        },
+    });
+    if (userListing === null || userListing === void 0 ? void 0 : userListing.savedProperty) {
+        for (const listing of userListing === null || userListing === void 0 ? void 0 : userListing.savedProperty) {
+            if (new ObjectId(listing.listingId).toString() === id) {
+                throw new AppError_1.default(http_status_1.default.CONFLICT, "Item is already in saved list!!");
+                break;
+            }
+        }
+    }
+    const data = {
+        listingId: id,
+        savedAt: new Date(),
+    };
+    const result = yield user_model_1.User.findByIdAndUpdate(user.id, { $push: { savedProperty: data } }, { new: true });
+    if (!result) {
+        throw new Error("Property failed to save");
+    }
+    return result;
+});
+const getSavedProperty = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.findById(user.id).populate({
+        path: "savedProperty",
+        populate: {
+            path: "listingId",
+        },
+    });
+    if (!result) {
+        throw new Error("Failed to retrieve saved property");
+    }
+    return result.savedProperty;
+});
+const removeSavedProperty = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.findByIdAndUpdate(user.id, { $pull: { savedProperty: id } }, { new: true });
+    if (!result) {
+        throw new Error("Property failed to remove");
+    }
+    return result.savedProperty;
+});
+const createRecentlyViewed = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const userListing = yield user_model_1.User.findById(user.id);
+    if (userListing === null || userListing === void 0 ? void 0 : userListing.recentlyViewed) {
+        for (const listing of userListing === null || userListing === void 0 ? void 0 : userListing.recentlyViewed) {
+            if (new ObjectId(listing.listingId).toString() === id) {
+                throw new AppError_1.default(http_status_1.default.CONFLICT, "Item is already in viewed list!!");
+                break;
+            }
+        }
+    }
+    const data = {
+        listingId: id,
+        savedAt: new Date(),
+    };
+    const result = yield user_model_1.User.findByIdAndUpdate(user.id, { $push: { recentlyViewed: data } }, { new: true });
+    if (!result) {
+        throw new Error("Property failed to save");
+    }
+    return result;
+});
+const getViewedProperty = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.findById(user.id).populate("recentlyViewed");
+    if (!result) {
+        throw new Error("Failed to retrieve viewed property");
+    }
+    return result.recentlyViewed;
+});
+const removeViewedProperty = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.findByIdAndUpdate(user.id, { $pull: { recentlyViewed: id } }, { new: true });
+    if (!result) {
+        throw new Error("Property failed to remove");
+    }
+    return result.recentlyViewed;
+});
 exports.ToLetListingsService = {
     createToLetListings,
     getAllToLetListings,
@@ -120,4 +201,10 @@ exports.ToLetListingsService = {
     updateToLetListings,
     deleteToLetListings,
     myLetListings,
+    createSavedProperty,
+    getSavedProperty,
+    removeSavedProperty,
+    createRecentlyViewed,
+    getViewedProperty,
+    removeViewedProperty,
 };

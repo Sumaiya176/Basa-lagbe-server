@@ -16,12 +16,53 @@ exports.userService = void 0;
 const AppError_1 = __importDefault(require("../../Error/AppError"));
 const user_model_1 = require("./user.model");
 const http_status_1 = __importDefault(require("http-status"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../../config"));
+const getAllUser = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.find();
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "No user found");
+    }
+    return result;
+});
+const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.findOne({ _id: id });
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "No user found");
+    }
+    return result;
+});
 const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield user_model_1.User.findOne({ email: payload === null || payload === void 0 ? void 0 : payload.email });
     if (isUserExist) {
         throw new AppError_1.default(http_status_1.default.CONFLICT, "User is already exists");
     }
     const result = yield user_model_1.User.create(payload);
+    if (!result) {
+        throw new Error("Failed to register new user");
+    }
+    let jwtPayload = {
+        name: result.userName,
+        id: result._id,
+        email: result.email,
+        role: result.role,
+    };
+    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
+        expiresIn: "10d",
+    });
+    console.log(accessToken);
+    const refreshToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_refresh_secret, {
+        expiresIn: "30d",
+    });
+    return { accessToken, refreshToken, result };
+});
+const createAdmin = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const admin = Object.assign(Object.assign({}, payload), { provider: "credentials" });
+    const isUserExist = yield user_model_1.User.findOne({ email: payload === null || payload === void 0 ? void 0 : payload.email });
+    if (isUserExist) {
+        throw new AppError_1.default(http_status_1.default.CONFLICT, "User is already exists");
+    }
+    const result = yield user_model_1.User.create(admin);
     if (!result) {
         throw new Error("Failed to register new user");
     }
@@ -43,6 +84,9 @@ const updateProfile = (userId, payload) => __awaiter(void 0, void 0, void 0, fun
     return result;
 });
 exports.userService = {
+    getAllUser,
+    getSingleUser,
     createUser,
+    createAdmin,
     updateProfile,
 };

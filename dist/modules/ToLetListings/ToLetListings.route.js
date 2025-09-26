@@ -256,9 +256,9 @@ const route = (0, express_1.Router)();
  */
 route.post("/", (0, auth_1.default)(), ImageSendToCloudinary_1.upload.array("propertyImages", 10), 
 // (req: Request, res: Response, next: NextFunction) => {
-//   console.log("hhjhj", req);
+//   console.log("hhjhj");
 //   req.body = JSON.parse(req.body);
-//   console.log(req.body);
+//   console.log("body", req.body);
 //   next();
 // },
 //schemaValidation(toLetListingValidation.createToLetListingValidationSchema),
@@ -269,6 +269,12 @@ route.get("/", (0, cors_1.default)({
     origin: ["https://basa-lagbe.vercel.app", "http://localhost:3000"],
     credentials: true,
 }), ToLetListings_controller_1.ToLetListingsController.getAllToLetListings);
+route.post("/savedProperty", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.createSavedProperty);
+route.get("/savedProperty", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.getSavedProperty);
+route.delete("/savedProperty/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.removeSavedProperty);
+route.post("/recentlyViewed", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.createRecentlyViewed);
+route.get("/recentlyViewed", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.getViewedProperty);
+route.delete("/recentlyViewed/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.removeViewedProperty);
 route.get("/:id", ToLetListings_controller_1.ToLetListingsController.getSingleToLetListings);
 route.patch("/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.updateToLetListings);
 route.delete("/:id", (0, auth_1.default)(), ToLetListings_controller_1.ToLetListingsController.deleteToLetListings);

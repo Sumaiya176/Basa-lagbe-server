@@ -50,10 +50,34 @@ const userSchema = new mongoose_1.Schema({
         enum: ["blocked", "active"],
         default: "active",
     },
+    savedProperty: [
+        {
+            listingId: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: "ToLetListing",
+            },
+            savedAt: {
+                type: Date,
+                required: true,
+            },
+        },
+    ],
     listingHistory: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
             ref: "ToLetListing",
+        },
+    ],
+    recentlyViewed: [
+        {
+            listingId: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: "ToLetListing",
+            },
+            savedAt: {
+                type: Date,
+                required: true,
+            },
         },
     ],
 }, {

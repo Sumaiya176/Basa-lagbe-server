@@ -9,6 +9,7 @@ const auth_controller_1 = require("./auth.controller");
 const schemaValidation_1 = __importDefault(require("../../middlewares/schemaValidation"));
 const auth_validation_1 = require("./auth.validation");
 const passport_1 = __importDefault(require("passport"));
+const auth_1 = __importDefault(require("../../middlewares/auth"));
 const router = (0, express_1.Router)();
 /**
  * @swagger
@@ -64,6 +65,7 @@ router.post("/refresh-token", (0, schemaValidation_1.default)(auth_validation_1.
 router.post("/change-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.changePasswordValidationSchema), auth_controller_1.authController.changePassword);
 router.post("/forget-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.forgetPasswordValidationSchema), auth_controller_1.authController.changePassword);
 router.post("/reset-password", (0, schemaValidation_1.default)(auth_validation_1.authValidation.resetPasswordValidationSchema), auth_controller_1.authController.changePassword);
+router.patch("/edit-profile", (0, auth_1.default)("user", "admin", "superAdmin"), auth_controller_1.authController.editProfile);
 // GitHub OAuth
 // router.get("/github", passport.authenticate("github", { scope: ["user:email"] }));
 // router.get(

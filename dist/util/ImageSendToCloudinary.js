@@ -7,38 +7,26 @@ exports.upload = exports.ImageSendToCloudinary = void 0;
 const config_1 = __importDefault(require("../config"));
 const cloudinary_1 = require("cloudinary");
 const multer_1 = __importDefault(require("multer"));
-const fs_1 = __importDefault(require("fs"));
+const stream_1 = require("stream");
 cloudinary_1.v2.config({
     cloud_name: config_1.default.cloudinary_cloud_name,
     api_key: config_1.default.cloudinary_api_key,
     api_secret: config_1.default.cloudinary_api_secret,
 });
-const ImageSendToCloudinary = (imageName, path) => {
+// ✅ Upload from buffer
+const ImageSendToCloudinary = (imageName, buffer) => {
     return new Promise((resolve, reject) => {
-        cloudinary_1.v2.uploader.upload(path, { public_id: imageName.trim() }, function (error, result) {
-            if (error) {
-                reject(error);
-            }
+        const uploadStream = cloudinary_1.v2.uploader.upload_stream({ public_id: imageName.trim(), folder: "propertyImages" }, (error, result) => {
+            if (error)
+                return reject(error);
+            if (!result)
+                return reject(new Error("Cloudinary result is empty"));
             resolve(result);
-            fs_1.default.unlink(path, (err) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    console.log("File is deleted");
-                }
-            });
         });
+        stream_1.Readable.from(buffer).pipe(uploadStream);
     });
 };
 exports.ImageSendToCloudinary = ImageSendToCloudinary;
-const storage = multer_1.default.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, process.cwd() + "/uploads/");
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + "-" + uniqueSuffix);
-    },
-});
-exports.upload = (0, multer_1.default)({ storage: storage });
+// ✅ Multer: memory storage only
+const storage = multer_1.default.memoryStorage();
+exports.upload = (0, multer_1.default)({ storage });

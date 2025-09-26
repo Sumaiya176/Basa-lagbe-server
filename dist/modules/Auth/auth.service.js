@@ -22,7 +22,7 @@ const config_1 = __importDefault(require("../../config"));
 const sendEmail_1 = __importDefault(require("../../util/sendEmail"));
 // ~~~~~~~~~~~~~~~~~~~~~~~ Login Service ~~~~~~~~~~~~~~~~~~~~~~~~~~
 const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(payload);
+    console.log("payload", payload);
     const isUserExists = yield user_model_1.User.findOne({ email: payload === null || payload === void 0 ? void 0 : payload.email }).select("+password");
     // ---- checking if the user is exist ------
     if (!isUserExists) {
@@ -37,6 +37,7 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isPasswordMatched)
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Wrong Password");
     const jwtPayload = {
+        name: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.userName,
         id: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists._id,
         email: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.email,
         role: isUserExists === null || isUserExists === void 0 ? void 0 : isUserExists.role,
@@ -65,6 +66,7 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized");
     }
     const jwtPayload = {
+        name: user === null || user === void 0 ? void 0 : user.userName,
         id: user === null || user === void 0 ? void 0 : user._id,
         email: user === null || user === void 0 ? void 0 : user.email,
         role: user === null || user === void 0 ? void 0 : user.role,
@@ -108,6 +110,7 @@ const forgetPassword = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "The user is blocked");
     }
     const jwtPayload = {
+        name: user === null || user === void 0 ? void 0 : user.userName,
         id: user === null || user === void 0 ? void 0 : user._id,
         email: user === null || user === void 0 ? void 0 : user.email,
         role: user === null || user === void 0 ? void 0 : user.role,
@@ -119,8 +122,8 @@ const forgetPassword = (id) => __awaiter(void 0, void 0, void 0, function* () {
     (0, sendEmail_1.default)(user === null || user === void 0 ? void 0 : user.email, resetLink);
 });
 // ~~~~~~~~~~~~~~~~~~~~~~~ Reset Password ~~~~~~~~~~~~~~~~~~~~~~~
-const resetPassword = (_a, token_1) => __awaiter(void 0, [_a, token_1], void 0, function* ({ id, newPassword }, token) {
-    const user = yield user_model_1.User.findById(id);
+const resetPassword = (_a, token_1) => __awaiter(void 0, [_a, token_1], void 0, function* ({ id, newPassword, oldPassword, }, token) {
+    const user = yield user_model_1.User.findById(id).select("+password");
     // ---- checking if the user is exist ------
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User is not found!!");
@@ -128,6 +131,10 @@ const resetPassword = (_a, token_1) => __awaiter(void 0, [_a, token_1], void 0, 
     // ----- checking if the user is blocked or not -----
     if (user.status === "blocked") {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "The user is blocked");
+    }
+    const comparedPassword = bcrypt_1.default.compare(oldPassword, user.password);
+    if (!comparedPassword) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Your old password is wrong");
     }
     const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
     if (id !== decoded.id) {
@@ -139,10 +146,28 @@ const resetPassword = (_a, token_1) => __awaiter(void 0, [_a, token_1], void 0, 
         passwordUpdatedAt: new Date(),
     });
 });
+// ~~~~~~~~~~~~~~~~~~~~~~~ edit profile ~~~~~~~~~~~~~~~~~~~~~~~
+const editProfile = (body, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findById(id);
+    // ---- checking if the user is not exist ------
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User is not found!!");
+    }
+    // ----- checking if the user is blocked or not -----
+    if (user.status === "blocked") {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "The user is blocked");
+    }
+    const result = yield user_model_1.User.findByIdAndUpdate(id, body, {
+        new: true,
+        runValidators: true,
+    });
+    return result;
+});
 exports.authService = {
     login,
     refreshToken,
     changePassword,
     forgetPassword,
     resetPassword,
+    editProfile,
 };

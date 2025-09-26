@@ -109,6 +109,9 @@ const router = (0, express_1.Router)();
  *
  *
  * */
+router.get("/", (0, auth_1.default)("admin", "superAdmin"), user_controller_1.userController.getAllUser);
+router.get("/getSingleUser", (0, auth_1.default)("user", "admin", "superAdmin"), user_controller_1.userController.getSingleUser);
 router.post("/", (0, schemaValidation_1.default)(user_validation_1.userValidation.createUserValidationSchema), user_controller_1.userController.createUser);
-router.patch("/updateProfile/:id", (0, auth_1.default)("admin", "user"), (0, schemaValidation_1.default)(user_validation_1.userValidation.updateUserProfileValidationSchema), user_controller_1.userController.updateProfile);
+router.post("/createAdmin", (0, auth_1.default)("superAdmin"), (0, schemaValidation_1.default)(user_validation_1.userValidation.createUserValidationSchema), user_controller_1.userController.createAdmin);
+router.patch("/updateProfile/:id", (0, auth_1.default)("admin", "user", "superAdmin"), (0, schemaValidation_1.default)(user_validation_1.userValidation.updateUserProfileValidationSchema), user_controller_1.userController.updateProfile);
 exports.userRouter = router;

@@ -17,7 +17,6 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       select: 0,
-      default: null,
     },
     provider: {
       type: String,
@@ -75,11 +74,13 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.pre("save", async function (next) {
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password as string,
-    Number(config.bcrypt_salt_rounds)
-  );
+  const user = this as IUser;
+  if (user.isModified("password") && user.password) {
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+  }
   next();
 });
 

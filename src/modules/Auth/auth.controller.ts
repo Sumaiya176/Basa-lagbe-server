@@ -27,20 +27,32 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const OAuthLoginSuccess = (req: Request, res: Response) => {
-  //if (!req.user) return res.sendStatus(401);
-
+const OAuthLoginSuccess = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   const user = req.user as any;
   console.log("hello from OAuthLoginSuccess", user);
+
+  if (!user) {
+    res.status(401).json({ success: false, message: "Unauthorized" });
+    return;
+  }
 
   res.cookie("refreshToken", user?.refreshToken, {
     secure: config.node_env === "production",
     httpOnly: true,
   });
 
-  // sendResponse(res, {
-  //   isSuccess: true,
-  //   message: "User is logged in successfully",
+  // Redirect back to frontend with accessToken in query
+  res.redirect(
+    `${config.frontend_url}/oAuth-success?token=${user?.accessToken}`
+  );
+
+  // res.status(200).json({
+  //   success: true,
+  //   message: "User logged in successfully",
   //   data: user,
   // });
 };

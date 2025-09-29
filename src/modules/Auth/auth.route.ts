@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { authController } from "./auth.controller";
 import schemaValidation from "../../middlewares/schemaValidation";
 import { authValidation } from "./auth.validation";
@@ -100,24 +100,26 @@ router.patch(
 // );
 
 router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  authController.OAuthLoginSuccess
+);
+
+router.get(
   "/github",
   passport.authenticate("github", { scope: ["profile", "email"] })
 );
 router.get(
   "/github/callback",
   passport.authenticate("github", {
-    failureRedirect: "/login",
-    session: false,
-  }),
-  authController.OAuthLoginSuccess
-);
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
     failureRedirect: "/login",
     session: false,
   }),

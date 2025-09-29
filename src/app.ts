@@ -27,11 +27,13 @@ app.use(express.urlencoded({ extended: true }));
 /// ----------- Passport ----------  ////
 app.use(
   session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || "keyboard cat",
     resave: false,
     saveUninitialized: false,
+    cookie: { secure: false }, // secure:true only on HTTPS
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(githubStrategy);
@@ -46,7 +48,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api", router);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Sumaiya’s To-Let Website Backend is Live ✅");
 });
 
 app.use(globalErrorHandler);

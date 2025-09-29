@@ -5,6 +5,7 @@ import { generateToken } from "../../../util/generateJwtToken";
 import AppError from "../../../Error/AppError";
 import httpStatus from "http-status";
 import config from "../../../config";
+import jwt from "jsonwebtoken";
 
 export const githubStrategy = new GitHubStrategy(
   {
@@ -19,9 +20,8 @@ export const githubStrategy = new GitHubStrategy(
     done: VerifyCallback
   ) => {
     try {
-      // console.log("profile", profile);
-      const email = "sumaiya.tr96@gmail.com";
-      //   const email = profile.emails?.[0].value;
+      console.log("profile", profile);
+      const email = profile.emails?.[0].value;
 
       console.log("profile", profile, "email", email);
 
@@ -31,31 +31,43 @@ export const githubStrategy = new GitHubStrategy(
           false
         );
 
-      let user = await User.findOneAndUpdate(
-        { email },
-        {
-          name: profile.username || email,
+      // check if user already exists
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        // create new user
+        user = await User.create({
+          userName: profile.displayName || email,
           email,
-          provider: "github",
-        },
+          provider: "google",
+        });
+      }
+
+      // generate JWT
+      const payload = {
+        name: user.userName,
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      };
+
+      const accessToken = jwt.sign(
+        payload,
+        config.jwt_access_secret as string,
         {
-          upsert: true,
-          new: true,
+          expiresIn: "10d",
+        }
+      );
+      const refreshToken = jwt.sign(
+        payload,
+        config.jwt_refresh_secret as string,
+
+        {
+          expiresIn: "30d",
         }
       );
 
-      const payload = {
-        id: user?._id,
-        email: user?.email,
-        role: user?.role,
-      };
-
-      const token = generateToken(
-        config.jwt_access_secret as string,
-        payload,
-        7
-      );
-      done(null, { token });
+      return done(null, { accessToken, refreshToken, user });
     } catch (error) {
       return done(error as Error, false);
     }

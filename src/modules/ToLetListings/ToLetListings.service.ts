@@ -54,7 +54,9 @@ const createToLetListings = async (
       { new: true, session }
     ).session(session);
 
+    console.log("updateUserListingHistory", user, updateUserListingHistory);
     if (!updateUserListingHistory) {
+      console.log("updateUserListingHistory", user, updateUserListingHistory);
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
 

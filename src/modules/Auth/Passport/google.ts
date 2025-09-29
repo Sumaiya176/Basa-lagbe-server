@@ -5,12 +5,13 @@ import AppError from "../../../Error/AppError";
 import httpStatus from "http-status";
 import { generateToken } from "../../../util/generateJwtToken";
 import config from "../../../config";
+import jwt from "jsonwebtoken";
 
 export const googleStrategy = new GoogleStrategy(
   {
     clientID: config.google_id as string,
     clientSecret: config.google_secret as string,
-    callbackURL: "/api/auth/google/callback",
+    callbackURL: "http://localhost:5000/api/auth/google/callback",
   },
   async (
     accessToken: string,
@@ -20,48 +21,51 @@ export const googleStrategy = new GoogleStrategy(
   ) => {
     try {
       const email = profile.emails?.[0]?.value;
-      //   const image = profile.photos?.[0]?.value;
 
-      console.log("profile", profile, "email", email);
-
-      if (!email)
+      if (!email) {
         return done(
           new AppError(httpStatus.NOT_FOUND, "No email found in profile"),
           false
         );
+      }
 
-      const user = await User.findOneAndUpdate(
-        { email },
-        {
-          name: profile.displayName || email,
+      // check if user already exists
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        // create new user
+        user = await User.create({
+          userName: profile.displayName || email,
           email,
           provider: "google",
-        },
+        });
+      }
+
+      // generate JWT
+      const payload = {
+        name: user.userName,
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      };
+
+      const accessToken = jwt.sign(
+        payload,
+        config.jwt_access_secret as string,
         {
-          upsert: true,
-          new: true,
-          setDefaultsOnInsert: true,
+          expiresIn: "10d",
+        }
+      );
+      const refreshToken = jwt.sign(
+        payload,
+        config.jwt_refresh_secret as string,
+
+        {
+          expiresIn: "30d",
         }
       );
 
-      const payload = {
-        id: user?._id,
-        email: user?.email,
-        role: user?.role,
-      };
-
-      const accessToken = generateToken(
-        config.jwt_access_secret as string,
-        payload,
-        7
-      );
-      const refreshToken = generateToken(
-        config.jwt_refresh_secret as string,
-        payload,
-        7
-      );
-
-      return done(null, { accessToken, refreshToken });
+      return done(null, { accessToken, refreshToken, user });
     } catch (error) {
       return done(error as Error, false);
     }

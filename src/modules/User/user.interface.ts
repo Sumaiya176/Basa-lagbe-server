@@ -5,9 +5,10 @@ type savedProperty = {
   savedAt: Date;
 };
 export interface IUser {
+  isModified(arg0: string): unknown;
   userName: string;
   email: string;
-  password?: string | null;
+  password?: string;
   provider: "google" | "github" | "facebook" | "credentials";
   passwordUpdatedAt?: Date | null;
   role: "user" | "admin" | "superAdmin";
